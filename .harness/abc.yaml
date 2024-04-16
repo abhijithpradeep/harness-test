@@ -1,0 +1,67 @@
+pipeline:
+  name: abc
+  identifier: abc
+  projectIdentifier: Abhijithtest
+  orgIdentifier: default
+  tags: {}
+  stages:
+    - stage:
+        name: abc
+        identifier: abc
+        description: ""
+        type: Deployment
+        spec:
+          deploymentType: Kubernetes
+          service:
+            serviceRef: s1
+          environment:
+            environmentRef: e1
+            gitBranch: main
+            deployToAll: false
+            infrastructureDefinitions:
+              - identifier: i1
+          execution:
+            steps:
+              - step:
+                  type: Verify
+                  name: Verify_1
+                  identifier: Verify_1
+                  spec:
+                    isMultiServicesOrEnvs: false
+                    type: Rolling
+                    monitoredService:
+                      type: Default
+                      spec: {}
+                    spec:
+                      sensitivity: HIGH
+                      duration: 5m
+                  timeout: 2h
+                  failureStrategies:
+                    - onFailure:
+                        errors:
+                          - Verification
+                        action:
+                          type: ManualIntervention
+                          spec:
+                            timeout: 2h
+                            onTimeout:
+                              action:
+                                type: StageRollback
+                    - onFailure:
+                        errors:
+                          - Unknown
+                        action:
+                          type: ManualIntervention
+                          spec:
+                            timeout: 2h
+                            onTimeout:
+                              action:
+                                type: Ignore
+            rollbackSteps: []
+        tags: {}
+        failureStrategies:
+          - onFailure:
+              errors:
+                - AllErrors
+              action:
+                type: StageRollback
